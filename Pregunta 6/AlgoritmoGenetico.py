@@ -19,8 +19,9 @@ def inicializar_poblacion(tam_poblacion, num_nodos):
 
 def evaluar_aptitud(individuo, distancias):
     aptitud = 0
-    for i in range(len(individuo)):
-        aptitud += distancias[individuo[i-1]][individuo[i]]
+    for i in range(len(individuo) - 1):
+        aptitud += distancias[individuo[i]][individuo[i + 1]]
+    aptitud += distancias[individuo[-1]][individuo[0]]  # Ciclo completo (regreso al inicio)
     return aptitud
 
 def seleccionar_padres(poblacion, aptitudes, k=3):
@@ -67,34 +68,25 @@ def mutacion(individuo, tasa_mutacion=0.1):
         i, j = random.sample(range(len(individuo)), 2)
         individuo[i], individuo[j] = individuo[j], individuo[i]
 
-# Configuración del algoritmo
+# Parámetros del algoritmo genético
 tam_poblacion = 10
 num_nodos = 5  # A, B, C, D, E
 num_generaciones = 100
 
-# Inicializar la población
+# Inicializar población
 poblacion = inicializar_poblacion(tam_poblacion, num_nodos)
 
-# Ejecutar el algoritmo genético
 for _ in range(num_generaciones):
-    # Evaluar la aptitud de cada individuo en la población
     aptitudes = [evaluar_aptitud(ind, distancias) for ind in poblacion]
-
-    # Seleccionar padres
     padres = seleccionar_padres(poblacion, aptitudes)
-
-    # Crear nueva población a través de cruce y mutación
     hijos = []
     for i in range(0, len(padres), 2):
-        if i+1 < len(padres):
+        if i + 1 < len(padres):
             hijo1, hijo2 = cruce_PMX(padres[i], padres[i+1])
             hijos.append(hijo1)
             hijos.append(hijo2)
-
     for hijo in hijos:
         mutacion(hijo)
-
-    # Actualizar la población
     poblacion = hijos
 
 # Mejor solución encontrada
