@@ -1,64 +1,66 @@
-import numpy as np
-import math
 import random
+import math
+import numpy as np
 
-# Definir el problema TSP: coordenadas de las ciudades
-ciudades = np.array([[0, 0], [1, 3], [4, 3], [6, 1], [3, 0]])
+# Definición de la distancia entre ciudades (matriz de distancias)
+distancias = np.array([
+    [0, 2, 9, 10],
+    [1, 0, 6, 4],
+    [15, 7, 0, 8],
+    [6, 3, 12, 0]
+])
 
-# Función de evaluación: calcular la longitud del tour
-def evaluar(tour):
-    distancia_total = 0
-    for i in range(len(tour) - 1):
-        distancia_total += np.linalg.norm(ciudades[tour[i]] - ciudades[tour[i + 1]])
-    distancia_total += np.linalg.norm(ciudades[tour[-1]] - ciudades[tour[0]])  # Retorno al inicio
-    return distancia_total
+# Función para calcular la longitud de un recorrido
+def longitud_recorrido(recorrido):
+    longitud = 0
+    for i in range(len(recorrido) - 1):
+        longitud += distancias[recorrido[i], recorrido[i+1]]
+    longitud += distancias[recorrido[-1], recorrido[0]]
+    return longitud
 
-# Generar una solución inicial aleatoria
+# Generar una solución inicial (permutación aleatoria de ciudades)
 def generar_solucion_inicial(n):
     solucion = list(range(n))
     random.shuffle(solucion)
     return solucion
 
-# Función de vecindad: intercambio de dos ciudades
+# Generar una vecindad (intercambiar dos ciudades)
 def generar_vecino(solucion):
     vecino = solucion.copy()
     i, j = random.sample(range(len(solucion)), 2)
     vecino[i], vecino[j] = vecino[j], vecino[i]
     return vecino
 
-# Algoritmo de Simulated Annealing
+# Simulated Annealing
 def recocido_simulado(solucion_inicial, temperatura_inicial, tasa_enfriamiento, iteraciones):
     solucion_actual = solucion_inicial
     mejor_solucion = solucion_inicial
+    mejor_longitud = longitud_recorrido(solucion_inicial)
     temperatura = temperatura_inicial
-    mejor_valor = evaluar(mejor_solucion)
-    
+
     for _ in range(iteraciones):
         vecino = generar_vecino(solucion_actual)
-        valor_actual = evaluar(solucion_actual)
-        valor_vecino = evaluar(vecino)
-        delta = valor_vecino - valor_actual
-        
-        if delta < 0 or random.random() < math.exp(-delta / temperatura):
+        delta = longitud_recorrido(vecino) - longitud_recorrido(solucion_actual)
+        if delta < 0 or random.uniform(0, 1) < math.exp(-delta / temperatura):
             solucion_actual = vecino
-            if valor_vecino < mejor_valor:
+            if longitud_recorrido(vecino) < mejor_longitud:
                 mejor_solucion = vecino
-                mejor_valor = valor_vecino
-        
+                mejor_longitud = longitud_recorrido(vecino)
         temperatura *= tasa_enfriamiento
-    
-    return mejor_solucion, mejor_valor
 
-# Parámetros de Simulated Annealing
-temperatura_inicial = 1000
-tasa_enfriamiento = 0.995
-iteraciones = 10000
+    return mejor_solucion, mejor_longitud
 
-# Generar una solución inicial
-solucion_inicial = generar_solucion_inicial(len(ciudades))
+# Parámetros del recocido simulado
+temperatura_inicial = 100
+tasa_enfriamiento = 0.99
+iteraciones = 1000
 
-# Ejecutar Simulated Annealing
-mejor_solucion, mejor_valor = recocido_simulado(solucion_inicial, temperatura_inicial, tasa_enfriamiento, iteraciones)
+# Solución inicial
+solucion_inicial = generar_solucion_inicial(len(distancias))
+print("Solución inicial:", solucion_inicial)
+print("Longitud inicial:", longitud_recorrido(solucion_inicial))
 
-print(f'Solución inicial: {solucion_inicial}, Valor: {evaluar(solucion_inicial)}')
-print(f'Mejor solución: {mejor_solucion}, Mejor valor: {mejor_valor}')
+# Aplicar recocido simulado
+mejor_solucion, mejor_longitud = recocido_simulado(solucion_inicial, temperatura_inicial, tasa_enfriamiento, iteraciones)
+print("Mejor solución:", mejor_solucion)
+print("Mejor longitud:", mejor_longitud)
