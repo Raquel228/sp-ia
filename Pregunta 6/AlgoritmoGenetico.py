@@ -3,11 +3,11 @@ import random
 
 # Matriz de distancias basada en la imagen
 distancias = np.array([
-    [0, 7, 9, 10, 20],  # Distancias desde A
-    [7, 0, 0, 8, 0],    # Distancias desde B
-    [9, 0, 0, 0, 15],   # Distancias desde C
-    [10, 8, 0, 0, 11],  # Distancias desde D
-    [20, 0, 15, 11, 0]  # Distancias desde E
+    [0, 7,  9, 8, 20],   # Distancias desde A
+    [7, 0, 10, 4, 11],   # Distancias desde B
+    [9,10, 0, 15, 5 ],   # Distancias desde C
+    [8, 4, 15, 0, 17],   # Distancias desde D
+    [20,11, 5, 17, 0]    # Distancias desde E
 ])
 
 def inicializar_poblacion(tam_poblacion, num_nodos):
