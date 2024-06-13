@@ -1,6 +1,6 @@
 import numpy as np
 import random
-
+import tensorflow as tf
 # Matriz de distancias basada en la imagen
 distancias = np.array([
     [0, 7, 9, 10, 20],  # Distancias desde A
